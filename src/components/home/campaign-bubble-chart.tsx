@@ -102,7 +102,7 @@ export function CampaignBubbleChart() {
     node.append('text')
         .attr('dy', '.3em')
         .style('text-anchor', 'middle')
-        .style('font-size', d => `${Math.max(10, d.radius / 5)}px`)
+        .style('font-size', d => `${Math.max(10, d.radius / 4)}px`)
         .style('fill', 'white')
         .style('pointer-events', 'none')
         .text(d => d.id.replace(/_/g, ' '));
