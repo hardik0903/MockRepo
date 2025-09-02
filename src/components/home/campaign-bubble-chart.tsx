@@ -76,12 +76,9 @@ export function CampaignBubbleChart() {
         .range(['#000000', '#000000', '#000000']);
 
     const simulation = d3.forceSimulation(nodes)
-      .alpha(1) // Start with high alpha
-      .alphaDecay(0.01)
-      .velocityDecay(0.2)
-      .force('charge', d3.forceManyBody().strength(10))
-      .force('center', d3.forceCenter(width / 2, height / 2).strength(1.2)) // Stronger center force
-      .force('collision', d3.forceCollide().radius(d => d.radius - 1).strength(1)) // Tighter collision
+      .force('charge', d3.forceManyBody().strength(5))
+      .force('center', d3.forceCenter(width / 2, height / 2).strength(1.5))
+      .force('collision', d3.forceCollide().radius(d => d.radius + 1).strength(1))
       .on('tick', ticked);
 
     const node = svg.selectAll('.bubble')
@@ -117,6 +114,16 @@ export function CampaignBubbleChart() {
         return `translate(${d.x},${d.y})`
       });
     }
+
+    // Add a gentle, continuous shake
+    d3.timer(() => {
+        nodes.forEach(d => {
+            d.x! += (Math.random() - 0.5) * 0.1;
+            d.y! += (Math.random() - 0.5) * 0.1;
+        });
+        simulation.alpha(0.01);
+    });
+
 
   }, [campaigns, view, selectedGlobal]);
 
