@@ -31,33 +31,6 @@ const features = [
   },
 ];
 
-const AnimatedGetStartedButton = () => (
-    <Link href="/dashboard">
-        <button className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-md bg-neutral-800 px-6 font-medium text-neutral-50 transition-all duration-300 hover:bg-neutral-900">
-            <span className="relative">Get Started</span>
-            <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]">
-                <div className="relative h-full w-8 bg-white/20"></div>
-            </div>
-        </button>
-    </Link>
-);
-
-const ThreeDCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
-    <div className="group w-[300px] [perspective:1000px] p-5">
-        <div className="relative h-full w-full rounded-xl border-2 border-neutral-300 bg-neutral-100/70 p-6 text-neutral-800 shadow-xl transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(18deg)]">
-            <div className="relative z-10 flex flex-col gap-4">
-                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-800 text-white">
-                    {icon}
-                 </div>
-                <h3 className="text-2xl font-bold">{title}</h3>
-                <p className="text-sm text-neutral-600">{description}</p>
-                <span className="text-sm font-bold text-neutral-800">See More &rarr;</span>
-            </div>
-        </div>
-    </div>
-)
-
-
 export default function HomePage() {
   return (
     <div className="w-full relative overflow-hidden bg-white text-black">
@@ -114,7 +87,6 @@ export default function HomePage() {
                             <div className="relative z-10 flex flex-col gap-4 [backface-visibility:hidden]">
                                 {feature.icon}
                                 <h3 className="text-2xl font-bold">{feature.title}</h3>
-                                <span className="text-sm font-semibold">Hover to learn more</span>
                             </div>
                         </div>
                     </div>

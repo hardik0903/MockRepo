@@ -11,6 +11,7 @@ interface BubbleNode extends d3.SimulationNodeDatum {
   value: number;
   type: 'global' | 'local';
   label: 'anti-india' | 'not-anti' | 'none';
+  radius: number;
 }
 
 export function CampaignBubbleChart() {
@@ -43,7 +44,7 @@ export function CampaignBubbleChart() {
 
     svg.selectAll('*').remove(); // Clear previous render
 
-    let data: BubbleNode[];
+    let data: Omit<BubbleNode, 'radius'>[];
     if (view === 'global') {
         data = Object.entries(campaigns).map(([global, locals]) => ({
             id: global,
@@ -65,20 +66,22 @@ export function CampaignBubbleChart() {
     if(data.length === 0) return;
 
     const maxVal = d3.max(data, d => d.value) || 1;
-    const radiusScale = d3.scaleSqrt().domain([0, maxVal]).range([10, width/6]);
+    const radiusScale = d3.scaleSqrt().domain([0, maxVal]).range([10, Math.min(width, height) / 6]);
+
+    const nodes: BubbleNode[] = data.map(d => ({ ...d, radius: radiusScale(d.value) }));
     
     const colorScale = d3.scaleOrdinal<string>()
         .domain(['anti-india', 'not-anti', 'none'])
         .range(['#ef4444', '#3b82f6', '#6b7280']);
 
-    const simulation = d3.forceSimulation(data)
+    const simulation = d3.forceSimulation(nodes)
       .force('charge', d3.forceManyBody().strength(5))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(d => radiusScale(d.value) + 2))
+      .force('collision', d3.forceCollide().radius(d => d.radius + 2))
       .on('tick', ticked);
 
     const node = svg.selectAll('.bubble')
-      .data(data)
+      .data(nodes)
       .enter().append('g')
       .attr('class', 'bubble')
       .style('cursor', 'pointer')
@@ -90,7 +93,7 @@ export function CampaignBubbleChart() {
       });
       
     node.append('circle')
-        .attr('r', d => radiusScale(d.value))
+        .attr('r', d => d.radius)
         .attr('fill', d => colorScale(d.label))
         .attr('stroke', '#ffffff')
         .attr('stroke-width', 2);
@@ -98,13 +101,17 @@ export function CampaignBubbleChart() {
     node.append('text')
         .attr('dy', '.3em')
         .style('text-anchor', 'middle')
-        .style('font-size', d => `${Math.max(10, radiusScale(d.value) / 4)}px`)
+        .style('font-size', d => `${Math.max(10, d.radius / 4)}px`)
         .style('fill', 'white')
         .style('pointer-events', 'none')
         .text(d => d.id.replace(/_/g, ' '));
         
     function ticked() {
-      node.attr('transform', d => `translate(${d.x},${d.y})`);
+      node.attr('transform', d => {
+        d.x = Math.max(d.radius, Math.min(width - d.radius, d.x || 0));
+        d.y = Math.max(d.radius, Math.min(height - d.radius, d.y || 0));
+        return `translate(${d.x},${d.y})`
+      });
     }
 
   }, [campaigns, view, selectedGlobal]);
