@@ -1,5 +1,5 @@
 'use client';
-import { APIProvider, Map, useMap, AdvancedMarker } from '@vis.gl/react-google-maps';
+import { APIProvider, Map as GoogleMap, useMap } from '@vis.gl/react-google-maps';
 import type { LocationData } from '@/lib/types';
 import { AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -11,6 +11,11 @@ async function geocodeLocation(address: string): Promise<google.maps.LatLngLiter
         return geocodeCache.get(address)!;
     }
     try {
+        // This check is to ensure google.maps is loaded
+        if (typeof google === 'undefined' || !google.maps || !google.maps.Geocoder) {
+            console.error("Google Maps API not loaded.");
+            return null;
+        }
         const geocoder = new google.maps.Geocoder();
         const response = await geocoder.geocode({ address });
         if (response.results[0]) {
@@ -29,9 +34,26 @@ async function geocodeLocation(address: string): Promise<google.maps.LatLngLiter
 function HeatmapComponent({ data }: { data: LocationData }) {
   const map = useMap();
   const [heatmapData, setHeatmapData] = useState<google.maps.visualization.WeightedLocation[]>([]);
+  const [heatmapLayer, setHeatmapLayer] = useState<google.maps.visualization.HeatmapLayer | null>(null);
 
   useEffect(() => {
-    if (!map || !data || Object.keys(data).length === 0) return;
+    if (!map) return;
+    
+    // Initialize heatmap layer once
+    const heatmap = new google.maps.visualization.HeatmapLayer({
+        radius: 30,
+    });
+    setHeatmapLayer(heatmap);
+    heatmap.setMap(map);
+
+    return () => {
+        heatmap.setMap(null);
+    };
+  }, [map]);
+
+
+  useEffect(() => {
+    if (!heatmapLayer || !data || Object.keys(data).length === 0) return;
 
     let isMounted = true;
     
@@ -46,7 +68,8 @@ function HeatmapComponent({ data }: { data: LocationData }) {
 
       const results = await Promise.all(promises);
       if(isMounted) {
-          setHeatmapData(results.filter((item): item is google.maps.visualization.WeightedLocation => item !== null));
+          const validData = results.filter((item): item is google.maps.visualization.WeightedLocation => item !== null);
+          heatmapLayer.setData(validData);
       }
     }
 
@@ -55,22 +78,8 @@ function HeatmapComponent({ data }: { data: LocationData }) {
     return () => {
         isMounted = false;
     }
-  }, [map, data]);
+  }, [heatmapLayer, data]);
 
-
-  useEffect(() => {
-    if (!map || heatmapData.length === 0) return;
-
-    const heatmap = new google.maps.visualization.HeatmapLayer({
-      data: heatmapData,
-      radius: 30,
-      map: map
-    });
-
-    return () => {
-      heatmap.setMap(null);
-    };
-  }, [map, heatmapData]);
 
   return null;
 }
@@ -95,7 +104,7 @@ export function LocationMap({ data }: { data: LocationData }) {
   return (
     <div className="w-full h-[600px] rounded-lg overflow-hidden">
       <APIProvider apiKey={apiKey} libraries={['visualization', 'geocoding']}>
-        <Map
+        <GoogleMap
           defaultCenter={position}
           defaultZoom={4}
           mapId="sentinel-map"
@@ -103,7 +112,7 @@ export function LocationMap({ data }: { data: LocationData }) {
           gestureHandling="greedy"
         >
           <HeatmapComponent data={data} />
-        </Map>
+        </GoogleMap>
       </APIProvider>
     </div>
   );
