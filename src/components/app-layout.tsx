@@ -23,7 +23,6 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const navItems = [
-  { href: '/', label: 'Home', icon: Home },
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/feed', label: 'Feed', icon: Rss },
   { href: '/analytics', label: 'Analytics', icon: BrainCircuit },
@@ -36,6 +35,16 @@ function SidebarNav() {
 
   return (
     <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+      <Link
+          href="/"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+             pathname === '/' && "bg-muted text-primary"
+          )}
+        >
+          <Home className="h-4 w-4" />
+          Home
+      </Link>
       {navItems.map((item) => (
         <Link
           key={item.href}
@@ -59,7 +68,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
   if (isHomePage) {
     return (
-       <div className="flex flex-col min-h-screen">
+       <div className="flex flex-col min-h-screen bg-white">
          <main className="flex-1">{children}</main>
        </div>
     );

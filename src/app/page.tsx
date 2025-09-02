@@ -1,120 +1,165 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BrainCircuit, Globe, Library, ShieldCheck, Rss } from 'lucide-react';
+import { BrainCircuit, Globe, Library, ShieldCheck, Rss, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { KeywordTicker } from '@/components/home/keyword-ticker';
-import { TodaysInsights } from '@/components/home/todays-insights';
 import { Icons } from '@/components/icons';
+import { BackgroundRipple } from '@/components/ui/background-ripple';
+import { Input } from '@/components/ui/input';
+import { CampaignBubbleChart } from '@/components/home/campaign-bubble-chart';
+
 
 const features = [
   {
-    icon: <BrainCircuit className="h-10 w-10 text-primary" />,
+    icon: <BrainCircuit className="h-8 w-8 text-white" />,
     title: 'Advanced AI Analysis',
     description: 'Leverage cutting-edge AI to analyze tweet content, identify hate speech, and discover emerging keywords in real-time.',
   },
   {
-    icon: <Globe className="h-10 w-10 text-primary" />,
+    icon: <Globe className="h-8 w-8 text-white" />,
     title: 'Geolocation Heatmaps',
     description: 'Visualize the geographic origins of tweets on an interactive map to understand regional trends and campaign hotspots.',
   },
   {
-    icon: <Rss className="h-10 w-10 text-primary" />,
+    icon: <Rss className="h-8 w-8 text-white" />,
     title: 'Real-time Feed',
     description: 'Monitor a live feed of the most viral and most hateful tweets, keeping you updated on the latest online activity.',
   },
   {
-    icon: <Library className="h-10 w-10 text-primary" />,
+    icon: <Library className="h-8 w-8 text-white" />,
     title: 'Campaign Tracking',
-    description: 'Organize and explore global and local campaigns, tracking their descriptions and associated labels (anti-india vs. not-anti).',
+    description: 'Organize and explore global and local campaigns, tracking their descriptions and associated labels.',
   },
 ];
 
-const socialProofLogos = [
-  { name: 'TechCorp', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
-  { name: 'Innovate Inc.', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
-  { name: 'Data Insights', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
-  { name: 'SecureNet', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
-  { name: 'Global Solutions', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
-];
+const AnimatedGetStartedButton = () => (
+    <Link href="/dashboard">
+        <button className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-md bg-neutral-800 px-6 font-medium text-neutral-50 transition-all duration-300 hover:bg-neutral-900">
+            <span className="relative">Get Started</span>
+            <div className="absolute inset-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-100%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(100%)]">
+                <div className="relative h-full w-8 bg-white/20"></div>
+            </div>
+        </button>
+    </Link>
+);
+
+const ThreeDCard = ({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) => (
+    <div className="group w-[300px] [perspective:1000px] p-5">
+        <div className="relative h-full w-full rounded-xl border-2 border-neutral-300 bg-neutral-100/70 p-6 text-neutral-800 shadow-xl transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(18deg)]">
+            <div className="relative z-10 flex flex-col gap-4">
+                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-800 text-white">
+                    {icon}
+                 </div>
+                <h3 className="text-2xl font-bold">{title}</h3>
+                <p className="text-sm text-neutral-600">{description}</p>
+                <span className="text-sm font-bold text-neutral-800">See More &rarr;</span>
+            </div>
+        </div>
+    </div>
+)
+
 
 export default function HomePage() {
   return (
-    <div className="w-full relative overflow-hidden">
-      <div className="stars"></div>
-      <div className="stars2"></div>
-      <div className="stars3"></div>
-
-      <div className="relative z-10">
-        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] text-center px-4">
-          <ShieldCheck className="h-24 w-24 text-primary mb-6" />
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4 text-silver-fade">
-            SentinelX
-          </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Detecting Threats, Defending Truth.
-          </p>
-          <KeywordTicker />
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <Link href="/dashboard">
-              <Button size="lg">
-                Go to Dashboard
-              </Button>
-            </Link>
-             <Link href="#features">
-              <Button size="lg" variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors duration-300">
-                Learn More
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        <TodaysInsights />
-
-        <div id="features" className="py-16 md:py-24 px-4 md:px-8 bg-background/50 scroll-mt-20">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-silver-fade">
-              How SentinelX Works
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {features.map((feature) => (
-                <Card key={feature.title} className="bg-muted/40 border-primary/20 backdrop-blur-sm">
-                  <CardHeader className="flex flex-row items-center gap-4">
-                    {feature.icon}
-                    <CardTitle className="text-2xl font-semibold m-0">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="py-16 md:py-24">
-            <div className="max-w-5xl mx-auto px-4">
-                <h3 className="text-center text-muted-foreground font-semibold tracking-wider mb-8">TRUSTED BY LEADING ORGANIZATIONS</h3>
-                <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
-                    {socialProofLogos.map(p => (
-                        <div key={p.name}>{p.logo}</div>
-                    ))}
+    <div className="w-full relative overflow-hidden bg-white text-black">
+      <BackgroundRipple className="absolute inset-0" />
+      
+      <div className="relative z-10 flex min-h-screen flex-col">
+        {/* Hero Section */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-items-center md:justify-items-start px-8 md:px-16 pt-32 pb-16">
+            <div className="text-center md:text-left">
+                <h1 className="text-6xl md:text-8xl font-bold tracking-tighter bg-gradient-to-b from-neutral-600 to-neutral-900 bg-clip-text text-transparent">
+                    SentinelX
+                </h1>
+                <p className="mt-4 text-xl md:text-2xl text-neutral-600 max-w-md">
+                    Detecting Threats, Defending Truth.
+                </p>
+                <div className="mt-8">
+                   <Link href="/dashboard">
+                    <button className="group relative flex items-center bg-neutral-800 text-white font-medium py-3 pl-6 pr-12 rounded-lg overflow-hidden transition-all duration-300 shadow-lg hover:shadow-2xl">
+                        Get started
+                        <div className="absolute right-0 top-0 h-full w-10 bg-white flex items-center justify-center transform transition-all duration-300 group-hover:w-full">
+                        <ArrowRight className="h-6 w-6 text-neutral-800 transform transition-transform duration-300 group-hover:translate-x-1" />
+                        </div>
+                    </button>
+                   </Link>
                 </div>
             </div>
-        </div>
+             <div className="w-full max-w-md">
+                <Card className="bg-white/50 backdrop-blur-sm border-neutral-300">
+                    <CardHeader>
+                        <CardTitle className="text-neutral-800 text-2xl font-bold">Analyze a Tweet</CardTitle>
+                        <CardContent className="text-neutral-600 p-0 pt-2">Enter tweet data to get an instant analysis.</CardContent>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4">
+                       <Input placeholder="Paste JSON here..." className="bg-white/70 border-neutral-400 text-black placeholder:text-neutral-500" />
+                       <Link href="/dashboard" className="w-full">
+                        <Button className="w-full bg-neutral-800 hover:bg-neutral-900 text-white">Send</Button>
+                       </Link>
+                    </CardContent>
+                </Card>
+            </div>
+        </section>
 
-        <footer className="border-t border-border/50 py-8 px-4 md:px-8">
+        {/* Features Section */}
+        <section className="py-24 px-8">
+            <div className="container mx-auto flex flex-wrap justify-center gap-8">
+                {features.map(feature => (
+                    <div key={feature.title} className="group w-[300px] [perspective:1000px] p-1">
+                        <div className="relative h-full w-full rounded-xl border-2 border-neutral-700 bg-neutral-800 p-6 text-white shadow-xl transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(18deg)]">
+                             <div className="absolute inset-0 h-full w-full rounded-xl bg-black/80 px-12 text-center text-slate-200 [transform:rotateY(180deg)] [backface-visibility:hidden]">
+                                <div className="flex min-h-full flex-col items-center justify-center">
+                                    <p>{feature.description}</p>
+                                </div>
+                            </div>
+                            <div className="relative z-10 flex flex-col gap-4 [backface-visibility:hidden]">
+                                {feature.icon}
+                                <h3 className="text-2xl font-bold">{feature.title}</h3>
+                                <span className="text-sm font-semibold">Hover to learn more</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </section>
+        
+        {/* Brand Statement Section */}
+        <section className="py-24 px-8 md:px-16 bg-neutral-100">
+            <div className="container mx-auto">
+                <div className="max-w-3xl">
+                    <h2 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-b from-neutral-600 to-neutral-900 bg-clip-text text-transparent">What is SentinelX?</h2>
+                    <p className="mt-6 text-lg text-neutral-700 leading-relaxed">
+                        SentinelX is an advanced AI platform designed to safeguard digital discourse by detecting and analyzing anti-India narratives on social media. It performs deep text analysis in real-time to classify threats, identify propaganda campaigns, and extract hateful keywords. As a self-improving system, SentinelX constantly learns from new data to adapt to evolving tactics. We deliver the critical intelligence necessary to protect online discourse and neutralize misinformation campaigns effectively.
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        {/* Campaign Visualization Section */}
+        <section className="py-24 px-8 bg-white">
+             <div className="container mx-auto text-center">
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-b from-neutral-600 to-neutral-900 bg-clip-text text-transparent">Campaign Explorer</h2>
+                <p className="mt-4 text-lg text-neutral-600 max-w-2xl mx-auto">
+                    An interactive visualization of global and local campaigns. Bubble size represents the volume of activity. Click to dive deeper.
+                </p>
+                <div className="mt-12 w-full h-[600px] max-w-4xl mx-auto">
+                    <CampaignBubbleChart />
+                </div>
+             </div>
+        </section>
+
+        <footer className="border-t border-neutral-200 py-8 px-4 md:px-8">
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex items-center gap-2">
-                    <ShieldCheck className="h-6 w-6 text-primary" />
+                    <ShieldCheck className="h-6 w-6 text-neutral-800" />
                     <span className="font-semibold">SentinelX</span>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-4 text-sm text-neutral-500">
                     <span>Powered by Google AI & Google Cloud</span>
                 </div>
                 <nav className="flex gap-4 text-sm font-medium">
-                     <Link href="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">Dashboard</Link>
-                     <Link href="/feed" className="text-muted-foreground hover:text-primary transition-colors">Feed</Link>
-                     <Link href="/analytics" className="text-muted-foreground hover:text-primary transition-colors">Analytics</Link>
+                     <Link href="/dashboard" className="text-neutral-600 hover:text-neutral-900 transition-colors">Dashboard</Link>
+                     <Link href="/feed" className="text-neutral-600 hover:text-neutral-900 transition-colors">Feed</Link>
+                     <Link href="/analytics" className="text-neutral-600 hover:text-neutral-900 transition-colors">Analytics</Link>
                 </nav>
             </div>
         </footer>
