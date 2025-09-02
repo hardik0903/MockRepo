@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useEffect, useState } from 'react';
 import * as d3 from 'd3';
@@ -66,18 +67,20 @@ export function CampaignBubbleChart() {
     if(data.length === 0) return;
 
     const maxVal = d3.max(data, d => d.value) || 1;
-    const radiusScale = d3.scaleSqrt().domain([0, maxVal]).range([10, Math.min(width, height) / 6]);
+    const radiusScale = d3.scaleSqrt().domain([0, maxVal]).range([20, Math.min(width, height) / 5]);
 
     const nodes: BubbleNode[] = data.map(d => ({ ...d, radius: radiusScale(d.value) }));
     
     const colorScale = d3.scaleOrdinal<string>()
         .domain(['anti-india', 'not-anti', 'none'])
-        .range(['#ef4444', '#3b82f6', '#6b7280']);
+        .range(['hsl(var(--destructive))', 'hsl(var(--primary))', 'hsl(var(--primary))']);
 
     const simulation = d3.forceSimulation(nodes)
+      .alphaDecay(0.01) // Slower decay for continuous movement
+      .velocityDecay(0.3) // Some friction
       .force('charge', d3.forceManyBody().strength(5))
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(d => d.radius + 2))
+      .force('center', d3.forceCenter(width / 2, height / 2).strength(0.8))
+      .force('collision', d3.forceCollide().radius(d => d.radius + 4)) // Increased radius for spacing
       .on('tick', ticked);
 
     const node = svg.selectAll('.bubble')
@@ -101,7 +104,7 @@ export function CampaignBubbleChart() {
     node.append('text')
         .attr('dy', '.3em')
         .style('text-anchor', 'middle')
-        .style('font-size', d => `${Math.max(10, d.radius / 4)}px`)
+        .style('font-size', d => `${Math.max(10, d.radius / 5)}px`)
         .style('fill', 'white')
         .style('pointer-events', 'none')
         .text(d => d.id.replace(/_/g, ' '));
@@ -117,7 +120,7 @@ export function CampaignBubbleChart() {
   }, [campaigns, view, selectedGlobal]);
 
   if (loading) {
-    return <Skeleton className="w-full h-full rounded-full" />;
+    return <Skeleton className="w-full h-full rounded-lg" />;
   }
   
   return (
