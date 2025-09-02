@@ -78,7 +78,7 @@ export function CampaignBubbleChart() {
     const simulation = d3.forceSimulation(nodes)
       .force('charge', d3.forceManyBody().strength(5))
       .force('center', d3.forceCenter(width / 2, height / 2).strength(1.5))
-      .force('collision', d3.forceCollide().radius(d => d.radius + 1).strength(1))
+      .force('collision', d3.forceCollide().radius(d => d.radius + 2).strength(1))
       .on('tick', ticked);
 
     const node = svg.selectAll('.bubble')
@@ -99,10 +99,19 @@ export function CampaignBubbleChart() {
         .attr('stroke', '#ffffff')
         .attr('stroke-width', 2);
     
+    const getTextFontSize = (d: BubbleNode) => {
+        const text = d.id.replace(/_/g, ' ');
+        const maxTextWidth = d.radius * 1.8; // Use 90% of the diameter for text
+        const approxCharWidth = 0.5; // Estimated width of a character relative to font size
+        const calculatedSize = maxTextWidth / (text.length * approxCharWidth);
+        const maxSizeBasedOnRadius = d.radius / 2;
+        return `${Math.min(calculatedSize, maxSizeBasedOnRadius, 32)}px`; // Cap max font size
+    };
+    
     node.append('text')
         .attr('dy', '.3em')
         .style('text-anchor', 'middle')
-        .style('font-size', d => `${Math.max(10, d.radius / 4)}px`)
+        .style('font-size', getTextFontSize)
         .style('fill', 'white')
         .style('pointer-events', 'none')
         .text(d => d.id.replace(/_/g, ' '));
