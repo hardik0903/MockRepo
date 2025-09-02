@@ -83,7 +83,11 @@ const Cell = ({
   cols: number;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [delay] = useState(() => Math.random() * 200);
+  const [delay, setDelay] = useState(0);
+
+  useEffect(() => {
+    setDelay(Math.random() * 200);
+  }, []);
 
   const distanceFromMouse = (x: number, y: number) => {
     if (!ref.current) return 0;
