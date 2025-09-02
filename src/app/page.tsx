@@ -61,7 +61,7 @@ export default function HomePage() {
               </Button>
             </Link>
              <Link href="#features">
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors duration-300">
                 Learn More
               </Button>
             </Link>
