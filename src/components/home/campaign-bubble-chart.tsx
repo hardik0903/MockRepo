@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import { fetchCampaigns } from '@/lib/api';
 import type { Campaigns } from '@/lib/types';
@@ -18,8 +18,7 @@ export function CampaignBubbleChart() {
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<'global' | 'local'>('global');
   const [selectedGlobal, setSelectedGlobal] = useState<string | null>(null);
-  const svgRef =
-   React.useRef<SVGSVGElement>(null);
+  const svgRef = React.useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     async function loadData() {
