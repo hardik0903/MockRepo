@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/trending-keyword-generation.ts';
+// No flows are defined in this application.
+// This file is kept for Genkit compatibility.

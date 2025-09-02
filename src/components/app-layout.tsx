@@ -1,40 +1,51 @@
-import React from 'react';
-import {
-  BarChart2,
-  BrainCircuit,
-  LayoutDashboard,
-  Map,
-  Menu,
-  MessageSquare,
-  Search,
-} from 'lucide-react';
+'use client';
 
+import React from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import {
+  BarChart,
+  Home,
+  Menu,
+  Rss,
+  Globe,
+  Users,
+  Search,
+  Library,
+  BrainCircuit,
+  Shield,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Icons } from './icons';
 
 const navItems = [
-  { id: 'overview', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'network-graph', label: 'Network Graph', icon: BrainCircuit },
-  { id: 'heatmap', label: 'Heatmap', icon: Map },
-  { id: 'trending-keywords', label: 'Trending Keywords', icon: BarChart2 },
-  { id: 'tweet-analyzer', label: 'Tweet Analyzer', icon: MessageSquare },
+  { href: '/', label: 'Dashboard', icon: Home },
+  { href: '/feed', label: 'Feed', icon: Rss },
+  { href: '/analytics', label: 'Analytics', icon: BrainCircuit },
+  { href: '/geolocation', label: 'Geolocation', icon: Globe },
+  { href: '/campaigns', label: 'Campaigns', icon: Library },
 ];
 
 function SidebarNav() {
+  const pathname = usePathname();
+
   return (
     <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
       {navItems.map((item) => (
-        <a
-          key={item.id}
-          href={`#${item.id}`}
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+        <Link
+          key={item.href}
+          href={item.href}
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+            pathname === item.href && "bg-muted text-primary"
+          )}
         >
           <item.icon className="h-4 w-4" />
           {item.label}
-        </a>
+        </Link>
       ))}
     </nav>
   );
@@ -46,10 +57,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <a href="/" className="flex items-center gap-2 font-semibold">
-              <Icons.logo className="h-6 w-6 text-primary" />
-              <span className="">SentinelX</span>
-            </a>
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Shield className="h-6 w-6 text-primary" />
+              <span className="">Sentinel</span>
+            </Link>
           </div>
           <div className="flex-1">
             <SidebarNav />
@@ -71,10 +82,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
               <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-                <a href="/" className="flex items-center gap-2 font-semibold">
-                  <Icons.logo className="h-6 w-6 text-primary" />
-                  <span className="">SentinelX</span>
-                </a>
+                <Link href="/" className="flex items-center gap-2 font-semibold">
+                  <Shield className="h-6 w-6 text-primary" />
+                  <span className="">Sentinel</span>
+                </Link>
               </div>
               <SidebarNav />
             </SheetContent>

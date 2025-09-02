@@ -1,109 +1,133 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { networkGraphData } from '@/lib/mock-data';
+import type { NetworkGraphData } from '@/lib/types';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-export function NetworkGraph3D() {
+interface NodeObject extends THREE.Object3D {
+    velocity: THREE.Vector3;
+    isPinned: boolean;
+}
+
+export function NetworkGraph3D({ data }: { data: NetworkGraphData }) {
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!mountRef.current) return;
+    if (!mountRef.current || !data) return;
+
+    const width = mountRef.current.clientWidth;
+    const height = 500;
 
     // Scene setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, mountRef.current.clientWidth / 400, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(mountRef.current.clientWidth, 400);
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialiias: true, alpha: true });
+    renderer.setSize(width, height);
     mountRef.current.appendChild(renderer.domElement);
     
-    camera.position.z = 30;
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    camera.position.z = 35;
+
+    const nodeMap = new Map<string, { id: number, type: 'campaign' | 'user' | 'keyword' }>();
+    let nodeCount = 0;
+
+    const getNode = (name: string, type: 'campaign' | 'user' | 'keyword') => {
+        if (!nodeMap.has(name)) {
+            nodeMap.set(name, { id: nodeCount++, type });
+        }
+        return nodeMap.get(name)!.id;
+    };
     
-    const nodes = networkGraphData.nodes;
-    const links = networkGraphData.links;
+    const links: { source: number, target: number }[] = [];
+
+    // Process campaigns
+    for (const campaignName in data.campaign) {
+        const campaignId = getNode(campaignName, 'campaign');
+        const users = data.campaign[campaignName];
+        for (const userName in users) {
+            const userId = getNode(userName, 'user');
+            links.push({ source: campaignId, target: userId });
+            const { hatekeywords } = users[userName];
+            for (const keyword of hatekeywords) {
+                const keywordId = getNode(keyword, 'keyword');
+                links.push({ source: userId, target: keywordId });
+            }
+        }
+    }
+
+    const nodes = Array.from(nodeMap.entries()).map(([name, { id, type }]) => ({ id, name, type }));
     
-    const nodeObjects: THREE.Mesh[] = [];
+    const nodeObjects: NodeObject[] = [];
     const linkObjects: THREE.Line[] = [];
 
-    const nodeColors: { [key: string]: number } = {
-        campaign: 0xf97316,
-        user: 0xfbc08a,
-        keyword: 0xffffff
-    };
+    const nodeColors = { campaign: 0x8b5cf6, user: 0xec4899, keyword: 0xf4f4f5 };
+    const nodeSizes = { campaign: 1.0, user: 0.6, keyword: 0.3 };
 
     // Create nodes
     nodes.forEach(node => {
-        const geometry = new THREE.SphereGeometry(0.5, 32, 32);
-        const material = new THREE.MeshBasicMaterial({ color: nodeColors[node.type] || 0xffffff });
-        const sphere = new THREE.Mesh(geometry, material);
-        sphere.position.set(Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10);
+        const geometry = new THREE.SphereGeometry(nodeSizes[node.type], 16, 16);
+        const material = new THREE.MeshBasicMaterial({ color: nodeColors[node.type] });
+        const sphere = new THREE.Mesh(geometry, material) as NodeObject;
+        sphere.position.set((Math.random() - 0.5) * 30, (Math.random() - 0.5) * 30, (Math.random() - 0.5) * 30);
+        sphere.velocity = new THREE.Vector3();
+        sphere.isPinned = false;
         scene.add(sphere);
         nodeObjects.push(sphere);
     });
 
     // Create links
-    links.forEach(link => {
-        const material = new THREE.LineBasicMaterial({ color: 0xcccccc, transparent: true, opacity: 0.3 });
+    links.forEach(() => {
+        const material = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 });
         const geometry = new THREE.BufferGeometry();
         const line = new THREE.Line(geometry, material);
         scene.add(line);
         linkObjects.push(line);
     });
     
-    // Mouse interaction
-    let isDragging = false;
-    let previousMousePosition = { x: 0, y: 0 };
-    const onMouseDown = (event: MouseEvent) => {
-        isDragging = true;
-        previousMousePosition = { x: event.clientX, y: event.clientY };
-    };
-    const onMouseMove = (event: MouseEvent) => {
-        if (!isDragging) return;
-        const deltaMove = {
-            x: event.clientX - previousMousePosition.x,
-            y: event.clientY - previousMousePosition.y
-        };
-
-        scene.rotation.y += deltaMove.x * 0.005;
-        scene.rotation.x += deltaMove.y * 0.005;
-
-        previousMousePosition = { x: event.clientX, y: event.clientY };
-    };
-    const onMouseUp = () => { isDragging = false; };
-    const onWheel = (event: WheelEvent) => {
-        camera.position.z += event.deltaY * 0.01;
-    };
-    
-    renderer.domElement.addEventListener('mousedown', onMouseDown);
-    renderer.domElement.addEventListener('mousemove', onMouseMove);
-    renderer.domElement.addEventListener('mouseup', onMouseUp);
-    renderer.domElement.addEventListener('wheel', onWheel);
-
     const animate = () => {
         requestAnimationFrame(animate);
 
-        // Simple force simulation
-        nodes.forEach((nodeA, i) => {
-            nodes.forEach((nodeB, j) => {
-                if (i === j) return;
-                const posA = nodeObjects[i].position;
-                const posB = nodeObjects[j].position;
-                const distance = posA.distanceTo(posB);
-                if (distance < 10) {
-                    const force = new THREE.Vector3().subVectors(posA, posB).normalize().multiplyScalar(0.01);
-                    posA.add(force);
-                    posB.sub(force);
-                }
-            });
-        });
+        // Force simulation
+        const repulsionStrength = 0.1;
+        const attractionStrength = 0.002;
+        const centerStrength = 0.001;
 
-        links.forEach((link, i) => {
+        // Repulsion force
+        for (let i = 0; i < nodeObjects.length; i++) {
+            for (let j = i + 1; j < nodeObjects.length; j++) {
+                const nodeA = nodeObjects[i];
+                const nodeB = nodeObjects[j];
+                const delta = new THREE.Vector3().subVectors(nodeA.position, nodeB.position);
+                const distance = delta.length() + 0.1;
+                const force = delta.normalize().multiplyScalar(repulsionStrength / (distance * distance));
+                nodeA.velocity.add(force);
+                nodeB.velocity.sub(force);
+            }
+        }
+        
+        // Attraction force (links)
+        links.forEach(link => {
             const sourceNode = nodeObjects[link.source];
             const targetNode = nodeObjects[link.target];
-            const distance = sourceNode.position.distanceTo(targetNode.position);
-            const force = (distance - 15) * 0.001;
-            const direction = new THREE.Vector3().subVectors(targetNode.position, sourceNode.position).normalize();
-            sourceNode.position.add(direction.clone().multiplyScalar(force));
-            targetNode.position.sub(direction.clone().multiplyScalar(force));
+            const delta = new THREE.Vector3().subVectors(targetNode.position, sourceNode.position);
+            const force = delta.multiplyScalar(attractionStrength);
+            sourceNode.velocity.add(force);
+            targetNode.velocity.sub(force);
+        });
+
+        // Centering force
+        nodeObjects.forEach(node => {
+            const force = node.position.clone().multiplyScalar(-centerStrength);
+            node.velocity.add(force);
+        });
+
+        // Update positions
+        nodeObjects.forEach(node => {
+            if (!node.isPinned) {
+                node.position.add(node.velocity);
+            }
+            node.velocity.multiplyScalar(0.95); // Damping
         });
 
         // Update link positions
@@ -112,18 +136,19 @@ export function NetworkGraph3D() {
             const targetPos = nodeObjects[link.target].position;
             const positions = new Float32Array([sourcePos.x, sourcePos.y, sourcePos.z, targetPos.x, targetPos.y, targetPos.z]);
             linkObjects[i].geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            linkObjects[i].geometry.attributes.position.needsUpdate = true;
         });
         
+        controls.update();
         renderer.render(scene, camera);
     };
     animate();
 
     const handleResize = () => {
       if (mountRef.current) {
-        camera.aspect = mountRef.current.clientWidth / 400;
+        const newWidth = mountRef.current.clientWidth;
+        camera.aspect = newWidth / height;
         camera.updateProjectionMatrix();
-        renderer.setSize(mountRef.current.clientWidth, 400);
+        renderer.setSize(newWidth, height);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -133,12 +158,9 @@ export function NetworkGraph3D() {
         if (mountRef.current) {
             mountRef.current.removeChild(renderer.domElement);
         }
-        renderer.domElement.removeEventListener('mousedown', onMouseDown);
-        renderer.domElement.removeEventListener('mousemove', onMouseMove);
-        renderer.domElement.removeEventListener('mouseup', onMouseUp);
-        renderer.domElement.removeEventListener('wheel', onWheel);
+        controls.dispose();
     };
-  }, []);
+  }, [data]);
 
-  return <div ref={mountRef} className="w-full h-[400px] cursor-grab active:cursor-grabbing rounded-lg" />;
+  return <div ref={mountRef} className="w-full h-[500px] cursor-grab active:cursor-grabbing rounded-lg bg-muted/20" />;
 }
