@@ -14,6 +14,7 @@ import {
   Library,
   BrainCircuit,
   Shield,
+  LayoutDashboard,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -22,7 +23,8 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const navItems = [
-  { href: '/', label: 'Dashboard', icon: Home },
+  { href: '/', label: 'Home', icon: Home },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/feed', label: 'Feed', icon: Rss },
   { href: '/analytics', label: 'Analytics', icon: BrainCircuit },
   { href: '/geolocation', label: 'Geolocation', icon: Globe },
@@ -52,6 +54,59 @@ function SidebarNav() {
 }
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+
+  if (isHomePage) {
+    return (
+       <div className="flex flex-col min-h-screen">
+         <header className="flex h-16 items-center justify-between px-4 md:px-6 border-b bg-background/50 backdrop-blur-sm sticky top-0 z-20">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Shield className="h-6 w-6 text-primary" />
+              <span className="font-bold text-lg">SentinelX</span>
+            </Link>
+            <nav className="hidden md:flex gap-6">
+                 {navItems.slice(1).map((item) => ( // Hide Home link from header nav
+                    <Link key={item.href} href={item.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+                        {item.label}
+                    </Link>
+                 ))}
+            </nav>
+            <Sheet>
+                <SheetTrigger asChild>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    className="shrink-0 md:hidden"
+                >
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="flex flex-col">
+                    <nav className="grid gap-4 text-lg font-medium p-6">
+                        {navItems.map((item) => (
+                            <Link
+                            key={item.href}
+                            href={item.href}
+                            className={cn(
+                                "flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground",
+                                pathname === item.href && "text-foreground"
+                            )}
+                            >
+                                <item.icon className="h-5 w-5" />
+                                {item.label}
+                            </Link>
+                        ))}
+                    </nav>
+                </SheetContent>
+            </Sheet>
+         </header>
+         <main className="flex-1">{children}</main>
+       </div>
+    );
+  }
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -59,7 +114,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Shield className="h-6 w-6 text-primary" />
-              <span className="">Sentinel</span>
+              <span className="">SentinelX</span>
             </Link>
           </div>
           <div className="flex-1">
@@ -84,7 +139,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
                 <Link href="/" className="flex items-center gap-2 font-semibold">
                   <Shield className="h-6 w-6 text-primary" />
-                  <span className="">Sentinel</span>
+                  <span className="">SentinelX</span>
                 </Link>
               </div>
               <SidebarNav />
