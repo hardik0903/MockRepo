@@ -67,7 +67,7 @@ export function CampaignBubbleChart() {
     if(data.length === 0) return;
 
     const maxVal = d3.max(data, d => d.value) || 1;
-    const radiusScale = d3.scaleSqrt().domain([0, maxVal]).range([20, Math.min(width, height) / 5]);
+    const radiusScale = d3.scaleSqrt().domain([0, maxVal]).range([20, Math.min(width, height) / 4]);
 
     const nodes: BubbleNode[] = data.map(d => ({ ...d, radius: radiusScale(d.value) }));
     
