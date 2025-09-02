@@ -2,6 +2,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BrainCircuit, Globe, Library, ShieldCheck, Rss } from 'lucide-react';
 import Link from 'next/link';
+import { KeywordTicker } from '@/components/home/keyword-ticker';
+import { TodaysInsights } from '@/components/home/todays-insights';
+import { Icons } from '@/components/icons';
 
 const features = [
   {
@@ -26,6 +29,14 @@ const features = [
   },
 ];
 
+const socialProofLogos = [
+  { name: 'TechCorp', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
+  { name: 'Innovate Inc.', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
+  { name: 'Data Insights', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
+  { name: 'SecureNet', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
+  { name: 'Global Solutions', logo: <Icons.logo className="w-32 h-12 text-muted-foreground" /> },
+];
+
 export default function HomePage() {
   return (
     <div className="w-full relative overflow-hidden">
@@ -42,14 +53,24 @@ export default function HomePage() {
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
             Detecting Threats, Defending Truth.
           </p>
-          <Link href="/dashboard">
-            <Button size="lg">
-              Go to Dashboard
-            </Button>
-          </Link>
+          <KeywordTicker />
+          <div className="flex flex-col sm:flex-row gap-4 mt-8">
+            <Link href="/dashboard">
+              <Button size="lg">
+                Go to Dashboard
+              </Button>
+            </Link>
+             <Link href="#features">
+              <Button size="lg" variant="outline">
+                Learn More
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <div className="py-16 md:py-24 px-4 md:px-8 bg-background/50">
+        <TodaysInsights />
+
+        <div id="features" className="py-16 md:py-24 px-4 md:px-8 bg-background/50 scroll-mt-20">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-silver-fade">
               How SentinelX Works
@@ -69,6 +90,35 @@ export default function HomePage() {
             </div>
           </div>
         </div>
+
+        <div className="py-16 md:py-24">
+            <div className="max-w-5xl mx-auto px-4">
+                <h3 className="text-center text-muted-foreground font-semibold tracking-wider mb-8">TRUSTED BY LEADING ORGANIZATIONS</h3>
+                <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8">
+                    {socialProofLogos.map(p => (
+                        <div key={p.name}>{p.logo}</div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        <footer className="border-t border-border/50 py-8 px-4 md:px-8">
+            <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+                <div className="flex items-center gap-2">
+                    <ShieldCheck className="h-6 w-6 text-primary" />
+                    <span className="font-semibold">SentinelX</span>
+                </div>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span>Powered by Google AI & Google Cloud</span>
+                </div>
+                <nav className="flex gap-4 text-sm font-medium">
+                     <Link href="/dashboard" className="text-muted-foreground hover:text-primary transition-colors">Dashboard</Link>
+                     <Link href="/feed" className="text-muted-foreground hover:text-primary transition-colors">Feed</Link>
+                     <Link href="/analytics" className="text-muted-foreground hover:text-primary transition-colors">Analytics</Link>
+                </nav>
+            </div>
+        </footer>
+
       </div>
     </div>
   );
