@@ -1,0 +1,14 @@
+diff --git a/node_modules/react-wordcloud/package.json b/node_modules/react-wordcloud/package.json
+index 512b186..65dd74e 100644
+--- a/node_modules/react-wordcloud/package.json
++++ b/node_modules/react-wordcloud/package.json
+@@ -64,6 +64,9 @@
+     "react": "^16.13.0",
+     "react-dom": "^16.13.0"
+   },
++  "peerDependenciesMeta": {
++    "react": { "optional": true }
++  },
+   "publishConfig": {
+     "access": "public",
+     "registry": "https://registry.npmjs.org/"
