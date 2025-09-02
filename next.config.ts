@@ -1,7 +1,14 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://anti-india-tweet-analyzer-16808429129.us-central1.run.app/:path*',
+      },
+    ]
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

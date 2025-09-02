@@ -10,7 +10,7 @@ import type {
   LocationData
 } from './types';
 
-const BASE_URL = 'https://anti-india-tweet-analyzer-16808429129.us-central1.run.app';
+const BASE_URL = '/api';
 
 async function fetcher<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${BASE_URL}${endpoint}`;

@@ -76,7 +76,7 @@ function HeatmapComponent({ data }: { data: LocationData }) {
 }
 
 export function LocationMap({ data }: { data: LocationData }) {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const apiKey = "AIzaSyDxZERviMSMg2FJyPs3mZEXnIyMr0tmbiM";
 
   if (!apiKey) {
     return (
@@ -84,7 +84,7 @@ export function LocationMap({ data }: { data: LocationData }) {
         <AlertTriangle className="h-10 w-10 mb-4 text-destructive" />
         <h3 className="text-xl font-semibold">Google Maps API Key Missing</h3>
         <p className="text-center mt-2 text-sm">
-          Please set the NEXT_PUBLIC_GOOGLE_MAPS_API_KEY environment variable.
+          A Google Maps API key is required to display the map.
         </p>
       </div>
     );
