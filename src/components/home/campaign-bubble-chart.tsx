@@ -73,14 +73,14 @@ export function CampaignBubbleChart() {
     
     const colorScale = d3.scaleOrdinal<string>()
         .domain(['anti-india', 'not-anti', 'none'])
-        .range(['hsl(var(--destructive))', 'hsl(var(--primary))', 'hsl(var(--primary))']);
+        .range(['#000000', '#000000', '#000000']);
 
     const simulation = d3.forceSimulation(nodes)
       .alphaDecay(0.01) // Slower decay for continuous movement
       .velocityDecay(0.3) // Some friction
       .force('charge', d3.forceManyBody().strength(5))
       .force('center', d3.forceCenter(width / 2, height / 2).strength(0.8))
-      .force('collision', d3.forceCollide().radius(d => d.radius + 4)) // Increased radius for spacing
+      .force('collision', d3.forceCollide().radius(d => d.radius + 1)) // Reduced radius for closer packing
       .on('tick', ticked);
 
     const node = svg.selectAll('.bubble')
