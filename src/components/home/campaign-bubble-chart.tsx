@@ -134,7 +134,7 @@ export function CampaignBubbleChart() {
   return (
     <div className="relative w-full h-full">
         {view === 'local' && (
-            <Button onClick={() => setView('global')} variant="outline" className="absolute top-2 left-2 z-10 bg-white/70 hover:bg-orange-500 hover:text-white">
+            <Button onClick={() => setView('global')} variant="outline" className="absolute top-2 left-2 z-10 bg-white/70">
                 &larr; Back to Global
             </Button>
         )}
