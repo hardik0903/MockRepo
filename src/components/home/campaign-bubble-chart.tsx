@@ -76,11 +76,12 @@ export function CampaignBubbleChart() {
         .range(['#000000', '#000000', '#000000']);
 
     const simulation = d3.forceSimulation(nodes)
-      .alphaDecay(0.01) // Slower decay for continuous movement
-      .velocityDecay(0.3) // Some friction
-      .force('charge', d3.forceManyBody().strength(5))
-      .force('center', d3.forceCenter(width / 2, height / 2).strength(0.8))
-      .force('collision', d3.forceCollide().radius(d => d.radius + 1)) // Reduced radius for closer packing
+      .alpha(1) // Start with high alpha
+      .alphaDecay(0.01)
+      .velocityDecay(0.2)
+      .force('charge', d3.forceManyBody().strength(10))
+      .force('center', d3.forceCenter(width / 2, height / 2).strength(1.2)) // Stronger center force
+      .force('collision', d3.forceCollide().radius(d => d.radius - 1).strength(1)) // Tighter collision
       .on('tick', ticked);
 
     const node = svg.selectAll('.bubble')
@@ -126,7 +127,7 @@ export function CampaignBubbleChart() {
   return (
     <div className="relative w-full h-full">
         {view === 'local' && (
-            <Button onClick={() => setView('global')} variant="outline" className="absolute top-2 left-2 z-10 bg-white/70">
+            <Button onClick={() => setView('global')} variant="outline" className="absolute top-2 left-2 z-10 bg-white/70 hover:bg-orange-500 hover:text-white">
                 &larr; Back to Global
             </Button>
         )}
